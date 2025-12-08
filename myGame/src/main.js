@@ -2,7 +2,9 @@ import kaplay from "kaplay";
 import "kaplay/global"; // uncomment if you want to use without the k. prefix
 import init from "./init";
 
-kaplay();
+kaplay({
+    background: [0,0,0],
+});
 
 const FLOOR_HEIGHT = 48;
 const JUMP_FORCE = 800;
@@ -14,8 +16,7 @@ let jumpCounter = 0;
 let comboCount = 0;
 
 onUpdate(() => {
-    healthBar.pos.x = sheep.pos.x - 30;
-    healthBar.pos.y = sheep.pos.y - 50;
+
 });
 
 scene("game", () => {
@@ -25,6 +26,62 @@ scene("game", () => {
     loadRoot("./"); // A good idea for Itch.io publishing later
 
     init();
+// Health bar background (gray/red background)
+const healthBarBg = add([
+    rect(200, 20),
+    pos(width() / 2 - 100, 20),
+    color(100, 100, 100),  // Gray background
+    fixed(),               // Stays on screen (UI element)
+    z(100),                // On top of everything
+]);
+    // Health bar foreground (green bar that shrinks)
+const healthBar = add([
+    rect(200, 20),
+    pos(width() / 2 - 100, 20),
+    color(0, 200, 0),      // Green
+    fixed(),
+    z(101),
+]);
+
+// Optional: Health text label
+const healthText = add([
+    text("100/100", { size: 16 }),
+    pos(width() / 2 -90 , 22),
+    color(255, 255, 255),
+    outline(3, rgb(0, 0, 0)),
+    fixed(),
+    z(102),
+]);
+
+// Combo display
+const comboText = add([
+    text("COMBO: 0", { size: 24 }),
+    pos(width() / 2, 60),
+    anchor("center"),
+    fixed(),
+    z(100),
+    color(255, 255, 0),  // Yellow
+    outline(4, rgb(0, 0, 0)), 
+]);
+
+// The gate on the right side
+const gate = add([
+    rect(40, 150),
+    pos(width() - 60, height() - FLOOR_HEIGHT - 150),
+    color(150, 75, 0),      // Brown/closed
+    area(),
+    body({ isStatic: true }),
+    "gate",
+]);
+
+// Gate label
+const gateLabel = add([
+    text("LOCKED", { size: 16 }),
+    pos(width() - 80, height() - FLOOR_HEIGHT - 180),
+    color(255, 0, 0),
+    fixed(),
+    z(100),
+]);
 
 
     // Add invisible FLOOR for physics/gravity
@@ -89,12 +146,28 @@ scene("game", () => {
             destroy(jet);
             shake(8);
             addKaboom(jet.pos);
+            comboCount++;
+            comboText.text = `COMBO: ${comboCount}`;
+
+                    // Check if combo reached 3 - OPEN THE GATE!
+        if (comboCount >= 3 && !gateOpen) {
+            gateOpen = true;
+            gate.color = rgb(0, 255, 0);  // Green = open
+            gateLabel.text = "OPEN!";
+            gateLabel.color = rgb(0, 255, 0);
+            shake(20);
+            
+            // Make gate passable (remove collision)
+            gate.unuse("body");
+        }
             
             // Give a little bounce after stomp
             sheep.jump(400);
         } else {
             // Jet hit sheep from front = DAMAGE!
             sheep.hurt(25);  // 25% of 100 health
+            healthBar.width = sheep.hp() / 100 * 200;
+            healthText.text = `${sheep.hp()}/100`;
             shake(12);
             
             // Optional: knockback the sheep
@@ -102,12 +175,21 @@ scene("game", () => {
             
             // Destroy the jet after hitting (or keep it if you want it to fly through)
             destroy(jet);
+
+            comboCount = 0;
+            comboText.text = `COMBO: ${comboCount}`;
             
             // Check for game over
             if (sheep.hp() <= 0) {
                 go("gameover");  // Create this scene or use go("game") to restart
             }
         }
+    });
+
+    sheep.onGround(() => {
+        jumpCounter = 0;
+        comboCount = 0;
+        comboText.text = `COMBO: ${comboCount}`;
     });
 
     onKeyDown("right", () => {
@@ -136,22 +218,45 @@ scene("game", () => {
 
     onKeyPress("up", () => {
         if (sheep.isFalling() || sheep.isGrounded()) {
-            jumpCounter++;
-            sheep.jump(JUMP_FORCE);
+            if (jumpCounter !== 10) {
+                jumpCounter++;
+                sheep.jump(JUMP_FORCE);
+            }
         } 
         if (jumpCounter === 2) {
             sheep.jump(SUPER_JUMP_FORCE);
             addKaboom(sheep.pos);
-            jumpCounter = 0;
+            jumpCounter = 10;
         }
-       if (jumpCounter >= 3) {
+       if (jumpCounter === 10 && sheep.isGrounded()) {
         jumpCounter = 0;
+        comboCount = 0;
+        comboText.text = `COMBO: ${comboCount}`;
         sheep.jump(0);
        }
     });
 
     onKeyDown("down", () => {
         sheep.move(SPEED, 200);
+    });
+
+    scene("win", (level) => {
+        add([
+            text(`LEVEL ${level - 1} COMPLETE!`, { size: 48 }),
+            pos(width() / 2, height() / 2 - 50),
+            anchor("center"),
+            color(255, 215, 0),  // Gold
+        ]);
+        
+        add([
+            text("Press SPACE for next level", { size: 24 }),
+            pos(width() / 2, height() / 2 + 50),
+            anchor("center"),
+        ]);
+        
+        onKeyPress("space", () => {
+            go("game");  // You could pass level number to increase difficulty
+        });
     });
 
 

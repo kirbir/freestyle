@@ -29,39 +29,12 @@ loadSprite("bean", "./sprites/bean.png").then((data) => {
 
     add([
         sprite("sky1"),
-        pos(0, 0),
+        pos(0, 100),
         anchor("topleft"),
         scale(width() / 900, 1),
         z(-2),  // Put behind other objects
     
     ]);
-
-// Health bar background (gray/red background)
-const healthBarBg = add([
-    rect(200, 20),
-    pos(width() / 2 - 100, 20),
-    color(100, 100, 100),  // Gray background
-    fixed(),               // Stays on screen (UI element)
-    z(100),                // On top of everything
-]);
-
-// Health bar foreground (green bar that shrinks)
-const healthBar = add([
-    rect(200, 20),
-    pos(width() / 2 - 100, 20),
-    color(0, 200, 0),      // Green
-    fixed(),
-    z(101),
-]);
-
-// Optional: Health text label
-const healthText = add([
-    text("100/100", { size: 16 }),
-    pos(width() / 2 -90 , 22),
-    color(255, 255, 255),
-    fixed(),
-    z(102),
-]);
 
     loadShader(
         "invert",
@@ -76,5 +49,9 @@ const healthText = add([
         }
     `,
     ); 
+
+
+
+  
 });
 }
