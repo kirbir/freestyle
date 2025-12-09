@@ -33,6 +33,9 @@
         - name: Reconfigure git to use HTTPS authentication
           run: git config --global url."https://github.com/".insteadOf ssh://git@github.com/
 
+        - name: Update npm
+          run: npm install npm@latest -g
+
         - name: Clean npm cache
           run: npm cache clean --force
 
