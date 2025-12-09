@@ -1,0 +1,38 @@
+  name: Release
+
+
+  on:
+    push:
+      branches:
+        - main
+
+
+  jobs:
+    exports:
+      name: Build, Release, and Upload
+      runs-on: ubuntu-latest
+      steps:
+        - name: Check out repository
+          uses: actions/checkout@v4
+
+        - name: Setup Node.js
+          uses: actions/setup-node@v4
+          with:
+            node-version: '20.x'
+
+        - name: Install dependencies
+          run: npm install
+
+        - name: Build
+          run: npm run build
+
+        - name: Zip dist folder
+          run: zip -r game.zip ./dist
+
+        - uses: KikimoraGames/itch-publish@v0.0.3
+          with:
+            butlerApiKey:  ${{secrets.ITCH_KEY}} 
+            gameData: ./game.zip
+            itchUsername: birkirvr
+            itchGameId: 4104778
+            buildChannel: webgl
