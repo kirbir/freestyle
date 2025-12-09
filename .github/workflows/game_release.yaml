@@ -17,14 +17,6 @@
         - name: Check out repository
           uses: actions/checkout@v3
 
-        - name: Debug - List directory contents
-          run: |
-            pwd
-            ls -la
-            echo "---"
-            echo "Checking for package.json:"
-            cat package.json || echo "package.json NOT FOUND!"
-
         - name: Setup Node.js
           uses: actions/setup-node@v4
           with:
@@ -36,41 +28,22 @@
         - name: Update npm
           run: npm install npm@latest -g
 
-        - name: Verify working directory and package.json
-          run: |
-            pwd
-            ls -la
-            if [ ! -f package.json ]; then
-              echo "ERROR: package.json not found in current directory!"
-              echo "Current directory contents:"
-              ls -la
-              echo "Looking for package.json in subdirectories:"
-              find . -name "package.json" -type f 2>/dev/null || echo "No package.json found anywhere!"
-              exit 1
-            fi
-            echo "package.json found at: $(pwd)/package.json"
-
-        - name: Clean npm cache
-          run: npm cache clean --force
-          working-directory: .
-
         - name: Install dependencies
-          run: |
-            pwd
-            ls -la package.json || (echo "package.json missing!" && exit 1)
-            npm install
-          working-directory: .
+          working-directory: ./myGame
+          run: npm install
 
         - name: Build
+          working-directory: ./myGame
           run: npm run build
 
         - name: Zip dist folder
+          working-directory: ./myGame
           run: zip -r game.zip ./dist
 
         - uses: KikimoraGames/itch-publish@v0.0.3
           with:
             butlerApiKey: ${{secrets.ITCH_KEY}} 
-            gameData: ./game.zip
+            gameData: ./myGame/game.zip
             itchUsername: birkirvr
             itchGameId: 4104778
             buildChannel: html5
