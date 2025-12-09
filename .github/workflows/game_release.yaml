@@ -17,6 +17,19 @@
         - name: Check out repository
           uses: actions/checkout@v3
 
+        - name: Find project directory
+          id: find-dir
+          run: |
+            if [ -f "myGame/package.json" ]; then
+              echo "PROJECT_DIR=myGame" >> $GITHUB_OUTPUT
+            elif [ -f "package.json" ]; then
+              echo "PROJECT_DIR=." >> $GITHUB_OUTPUT
+            else
+              echo "ERROR: package.json not found!"
+              find . -name "package.json" -type f
+              exit 1
+            fi
+
         - name: Setup Node.js
           uses: actions/setup-node@v4
           with:
@@ -29,21 +42,21 @@
           run: npm install npm@latest -g
 
         - name: Install dependencies
-          working-directory: ./myGame
+          working-directory: ${{ steps.find-dir.outputs.PROJECT_DIR }}
           run: npm install
 
         - name: Build
-          working-directory: ./myGame
+          working-directory: ${{ steps.find-dir.outputs.PROJECT_DIR }}
           run: npm run build
 
         - name: Zip dist folder
-          working-directory: ./myGame
+          working-directory: ${{ steps.find-dir.outputs.PROJECT_DIR }}
           run: zip -r game.zip ./dist
 
         - uses: KikimoraGames/itch-publish@v0.0.3
           with:
             butlerApiKey: ${{secrets.ITCH_KEY}} 
-            gameData: ./myGame/game.zip
+            gameData: ${{ steps.find-dir.outputs.PROJECT_DIR }}/game.zip
             itchUsername: birkirvr
             itchGameId: 4104778
             buildChannel: html5
