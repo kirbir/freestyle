@@ -1,11 +1,9 @@
 name: Release
 
-
 on:
   push:
     branches:
       - main
-
 
 jobs:
   exports:
@@ -25,24 +23,18 @@ jobs:
           node-version: '20.x'
 
       - name: Install dependencies
-        run: |
-          cd freestyle
-          npm install
+        run: npm ci
 
       - name: Build
-        run: |
-          cd freestyle
-          npm run build
+        run: npm run build
 
       - name: Zip dist folder
-        run: |
-          cd freestyle
-          zip -r game.zip ./dist
+        run: zip -r game.zip ./dist
 
       - uses: KikimoraGames/itch-publish@v0.0.3
         with:
           butlerApiKey: ${{secrets.ITCH_KEY}} 
-          gameData: ./myGame/game.zip
+          gameData: ./game.zip
           itchUsername: birkirvr
           itchGameId: 4104778
           buildChannel: webgl
