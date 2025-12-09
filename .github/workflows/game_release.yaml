@@ -42,17 +42,24 @@
             ls -la
             if [ ! -f package.json ]; then
               echo "ERROR: package.json not found in current directory!"
+              echo "Current directory contents:"
+              ls -la
+              echo "Looking for package.json in subdirectories:"
+              find . -name "package.json" -type f 2>/dev/null || echo "No package.json found anywhere!"
               exit 1
             fi
-            echo "package.json found!"
+            echo "package.json found at: $(pwd)/package.json"
 
         - name: Clean npm cache
           run: npm cache clean --force
+          working-directory: .
 
         - name: Install dependencies
           run: |
             pwd
+            ls -la package.json || (echo "package.json missing!" && exit 1)
             npm install
+          working-directory: .
 
         - name: Build
           run: npm run build
