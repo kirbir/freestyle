@@ -8,13 +8,19 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: freestyle  # ← THIS TELLS IT TO USE THE INNER FOLDER
     
     steps:
       - uses: actions/checkout@v4
 
+      - name: WHERE ARE THE FILES
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "Files here:"
+          ls -la
+          echo "Looking for package.json:"
+          find /home/runner/work -name "package.json"
+      
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -28,7 +34,7 @@ jobs:
       - uses: KikimoraGames/itch-publish@v0.0.3
         with:
           butlerApiKey: ${{secrets.ITCH_KEY}}
-          gameData: freestyle/game.zip  # ← ALSO UPDATE THIS
+          gameData: ./game.zip
           itchUsername: birkirvr
           itchGameId: 4104778
           buildChannel: webgl
