@@ -28,9 +28,16 @@
           working-directory: ./myGame
           run: npm run build
 
+        - name: List dist contents
+          working-directory: ./myGame
+          run: ls -la dist/
+
         - name: Zip dist folder
           working-directory: ./myGame
-          run: zip -r game.zip ./dist
+          run: cd dist && zip -r ../game.zip ./*
+
+        - name: Verify zip created
+          run: ls -la ./myGame/
 
         - uses: KikimoraGames/itch-publish@v0.0.3
           with:
@@ -38,4 +45,4 @@
             gameData: ./myGame/game.zip
             itchUsername: birkirvr
             itchGameId: 4104778
-            buildChannel: webgl
+            buildChannel: html5
