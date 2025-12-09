@@ -21,20 +21,24 @@
             node-version: '20.x'
 
         - name: Install dependencies
-          working-directory: ./myGame
-          run: npm install
+          run: |
+            cd myGame
+            npm install
 
         - name: Build
-          working-directory: ./myGame
-          run: npm run build
+          run: |
+            cd myGame
+            npm run build
 
         - name: List dist contents
-          working-directory: ./myGame
-          run: ls -la dist/
+          run: |
+            cd myGame
+            ls -la dist/
 
         - name: Zip dist folder
-          working-directory: ./myGame
-          run: cd dist && zip -r ../game.zip ./*
+          run: |
+            cd myGame/dist
+            zip -r ../game.zip ./*
 
         - name: Verify zip created
           run: ls -la ./myGame/
