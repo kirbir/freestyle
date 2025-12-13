@@ -1,5 +1,5 @@
 // src/managers/audioManager.js
-import { gameState } from "../data/gameState";
+import { gameState } from "../data/GameState";
 
 export class AudioManager {
   constructor() {

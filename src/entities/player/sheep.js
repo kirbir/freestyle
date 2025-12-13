@@ -1,5 +1,5 @@
 import GAME_CONFIG from "../../data/constants";
-import { gameState } from "../../data/gameState";
+import { gameState } from "../../data/GameState";
 
 export default function createSheep(x, y) {
   const config = GAME_CONFIG.PLAYER;
@@ -14,9 +14,13 @@ export default function createSheep(x, y) {
     pos(x, height() - FLOOR_HEIGHT - 100),
     area(),
     body(),
-    health(gameState.player.maxHealth),
+    health(gameState.player.health),
     "player",
   ]);
+
+  onKeyDown("1", () => {
+    go("boss1");
+  });
 
   onKeyDown("right", () => {
     sheep.move(config.SPEED, 0);

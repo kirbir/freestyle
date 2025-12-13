@@ -3,10 +3,11 @@ import kaplay from "kaplay";
 import "kaplay/global";
 import GAME_CONFIG from "./data/constants";
 import { createLevel1Scene } from "./scenes/level1";
+import createMenuScene from "./scenes/menu";
 import createBoss1 from "./scenes/boss1";
 import winScene from "./scenes/win";
 import gameOver from "./scenes/gameOver";
-import { gameState } from "./data/gameState";
+import { gameState } from "./data/GameState";
 
 // Initialize Kaplay
 kaplay({
@@ -18,13 +19,14 @@ kaplay({
 });
 
 // Register all scenes
+createMenuScene();
 createLevel1Scene();
 createBoss1();
 winScene();
 gameOver();
 
 // Start the game
-go("level1");
+go("menu");
 
 // Debug commands (press tilde ~ key)
 onKeyPress("grave", () => {

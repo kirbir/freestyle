@@ -1,5 +1,5 @@
 // src/scenes/level1.js
-import { gameState } from "../data/gameState";
+import { gameState } from "../data/GameState";
 import GAME_CONFIG from "../data/constants";
 import { createJet } from "../entities/enemies/enemyFactory";
 import { createHUD } from "../ui/uiFactory";
@@ -30,12 +30,14 @@ export function createLevel1Scene() {
 
     // Music handling
     let musicStarted = false;
+
     function startMusic() {
       if (!musicStarted) {
         musicStarted = true;
         audioManager.playMusic(levelConfig.music);
       }
     }
+
     onKeyPress(() => startMusic());
     onClick(() => startMusic());
 
